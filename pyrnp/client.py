@@ -109,7 +109,7 @@ class RNP:
             api_url=api_url,
             files=video_data,
             custom_headers={"Content-Disposition": "attachment;filename="},
-        ).json()
+        )
 
         thumb_file.close()
 
@@ -122,7 +122,7 @@ class RNP:
         require_keys(kwargs, ["filename", "id"])
         username = kwargs.get("username") or self.username
 
-        return_data = self.post(
+        return_data = self.post_request(
             api_url=f"video/{username}/change/file/default/{kwargs.get('id')}/{get_file_from_path(kwargs.get('filename'))}"  # noqa: E501
         )
 
@@ -134,9 +134,9 @@ class RNP:
     def change_data(self, **kwargs):
         require_keys(kwargs, ["id", "title", "keywords"])
         username = kwargs.get("username") or self.username
-        changeAssociation = kwargs.get("changeAssociation") or "false"
+        change_association = kwargs.get("changeAssociation") or "false"
 
-        api_url = f"video/{username}/update/{kwargs.pop('id')}?changeAssociation={changeAssociation}"
+        api_url = f"video/{username}/update/{kwargs.pop('id')}?changeAssociation={change_association}"
 
         video_data = {"video": (None, json.dumps(kwargs), "application/json")}
 
