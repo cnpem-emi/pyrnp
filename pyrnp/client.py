@@ -1,10 +1,7 @@
 from pyrnp.util import get_file_from_path
 from pyrnp.exception import InvalidFileError
-from threading import Lock
 
 import requests
-import json
-
 
 PLATFORMS = {"eduplay_test": "https://hmg.eduplay.rnp.br/services/", "eduplay": "https://eduplay.rnp.br/services/"}
 
@@ -49,7 +46,7 @@ class RNP:
         headers = self.get_header(self.oauth)
 
         if self.json:
-            return json.loads(requests.get(f"{self.url}{api_url}", headers=headers).content.decode())
+            return requests.get(f"{self.url}{api_url}", headers=headers).json()
         else:
             return requests.get(f"{self.url}{api_url}", headers=headers)
 
@@ -71,7 +68,7 @@ class RNP:
             full_url = f"{self.url}{api_url}"
 
         if self.json:
-            return json.loads(requests.post(full_url, headers=headers, files=files).content.decode())
+            return requests.post(full_url, headers=headers, files=files).json()
         else:
             return requests.post(full_url, headers=headers, files=files)
 
@@ -82,14 +79,12 @@ class RNP:
             "User-Agent": "curl/7.68.0",  # Keep this
         }
 
-        is_oauth = is_oauth if is_oauth is not None else self.oauth
-
-        if is_oauth and self.token:
+        if self.oauth and self.token:
             headers["Authorization"] = f"Bearer {self.token}"
 
         return headers
 
-    def upload(self, filename: str, id: str, oauth: bool = False):
+    def upload(self, filename: str, id: str):
         if filename.split(".")[1] not in SUPPORTED_FILETYPES:
             raise InvalidFileError("This filetype is not supported")
 
@@ -99,6 +94,8 @@ class RNP:
 
         if return_data["operationCode"] != 0:
             raise ConnectionError(f"Could not fetch upload URL: {return_data}")
+
+        print(return_data)
 
         with open(filename, "rb") as f:
             return_data = self.post_request(return_data["result"], files={parsed_filename: f})
@@ -117,7 +114,6 @@ class RNP:
         username: str = None,
         thumbnail: str = "thumb.png",
         thumb_file: bytes = None,
-        oauth: bool = False,
     ):
         if not username:
             username = self.username
@@ -149,7 +145,7 @@ class RNP:
 
         return return_data
 
-    def change_video(self, filename: str, id: str, username=None, oauth=False):
+    def change_video(self, filename: str, id: str, username=None):
         if not username:
             username = self.username
 
@@ -164,15 +160,10 @@ class RNP:
         if not username:
             username = self.username
 
-        headers = self.get_header(oauth)
-
-        del_resp = requests.delete(
-            f"{self.url}video/{username}/delete/{id}",
-            headers=headers,
-        )
+        del_resp = requests.delete(f"{self.url}video/{username}/delete/{id}", headers=self.get_header(oauth))
 
         if self.json:
-            return json.loads(del_resp.content.decode())
+            return del_resp.json()
         else:
             return del_resp
 
