@@ -1,8 +1,7 @@
-import json
-import unittest
-
 from pyrnp import RNP
+
 import responses
+import unittest
 
 
 def suite():

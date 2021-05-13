@@ -95,8 +95,6 @@ class RNP:
         if return_data["operationCode"] != 0:
             raise ConnectionError(f"Could not fetch upload URL: {return_data}")
 
-        print(return_data)
-
         with open(filename, "rb") as f:
             return_data = self.post_request(return_data["result"], files={parsed_filename: f})
 
