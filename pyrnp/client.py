@@ -1,7 +1,7 @@
-from pyrnp.util import get_file_from_path
+from pyrnp.util import get_file_from_path, require_keys
 from pyrnp.exception import InvalidFileError
-
 import requests
+import json
 
 PLATFORMS = {"eduplay_test": "https://hmg.eduplay.rnp.br/services/", "eduplay": "https://eduplay.rnp.br/services/"}
 
@@ -28,14 +28,12 @@ class RNP:
         username: str = None,
         token: str = None,
         oauth: bool = False,
-        json: bool = True,
     ):
         self.client_key = client_key
         self.client_id = client_id
         self.username = username
         self.oauth = oauth
         self.token = token
-        self.json = json
 
         if platform not in PLATFORMS:
             raise NameError("Invalid platform selected. Available platforms: eduplay, rnp, rnp_test")
@@ -43,12 +41,7 @@ class RNP:
             self.url = PLATFORMS[platform]
 
     def get_request(self, api_url: str = None):
-        headers = self.get_header(self.oauth)
-
-        if self.json:
-            return requests.get(f"{self.url}{api_url}", headers=headers).json()
-        else:
-            return requests.get(f"{self.url}{api_url}", headers=headers)
+        return requests.get(f"{self.url}{api_url}", headers=self.get_header())
 
     def post_request(
         self,
@@ -56,23 +49,17 @@ class RNP:
         custom_headers: dict = None,
         files: dict = None,
     ):
-        headers = self.get_header(self.oauth)
+        headers = self.get_header()
 
         if custom_headers is not None:
             for k, v in custom_headers.items():
                 headers[k] = v
 
-        if "apps.kloud.rnp.br/media/" in api_url:
-            full_url = api_url
-        else:
-            full_url = f"{self.url}{api_url}"
+        return requests.post(
+            api_url if "apps.kloud.rnp.br/media/" in api_url else f"{self.url}{api_url}", headers=headers, files=files
+        )
 
-        if self.json:
-            return requests.post(full_url, headers=headers, files=files).json()
-        else:
-            return requests.post(full_url, headers=headers, files=files)
-
-    def get_header(self, is_oauth: bool = None):
+    def get_header(self):
         headers = {
             "Accept-Encoding": None,
             "clientKey": self.client_key,
@@ -84,89 +71,86 @@ class RNP:
 
         return headers
 
-    def upload(self, filename: str, id: str):
-        if filename.split(".")[1] not in SUPPORTED_FILETYPES:
+    def upload(self, **kwargs):
+        require_keys(kwargs, ["filename", "id"])
+
+        if kwargs.get("filename").split(".")[1] not in SUPPORTED_FILETYPES:
             raise InvalidFileError("This filetype is not supported")
 
-        parsed_filename = get_file_from_path(filename)
-
-        return_data = self.get_request(api_url=f"video/upload/url/{id}/{parsed_filename}")
+        parsed_filename = get_file_from_path(kwargs.get("filename"))
+        return_data = self.get_request(api_url=f"video/upload/url/{kwargs.get('id')}/{parsed_filename}").json()
 
         if return_data["operationCode"] != 0:
             raise ConnectionError(f"Could not fetch upload URL: {return_data}")
 
-        with open(filename, "rb") as f:
-            return_data = self.post_request(return_data["result"], files={parsed_filename: f})
+        with open(kwargs.get("filename"), "rb") as f:
+            req = self.post_request(return_data["result"], files={parsed_filename: f})
 
-        if "files" in return_data:
-            return return_data["files"][0]
+        if "files" in req.json():
+            return req
         else:
-            raise ConnectionError("Upload failed: " + return_data)
+            raise ConnectionError("Upload failed: " + req.content)
 
-    def publish(
-        self,
-        filename: str,
-        id: str,
-        title: str,
-        keywords: str,
-        username: str = None,
-        thumbnail: str = "thumb.png",
-        thumb_file: bytes = None,
-    ):
-        if not username:
-            username = self.username
+    def publish(self, **kwargs):
+        require_keys(kwargs, ["title", "keywords", "filename", "id"])
 
-        if type(thumbnail) == str and thumb_file is None:
-            thumb_file = open(thumbnail, "rb")
+        thumbnail = kwargs.get("thumbnail") or "thumb.png"
+        username = kwargs.get("username") or self.username
+        thumb_file = kwargs.get("thumb_file") or open(thumbnail, "rb")
+
+        api_url = f"video/{username}/save/{kwargs.pop('id')}/{get_file_from_path(kwargs.pop('filename'))}"
 
         video_data = {
-            "video": (
-                None,
-                f"<video><title>{title.replace('&', 'and')}</title><keywords>{keywords.replace('&', 'and')}</keywords></video>",  # noqa: E501
-                "text/xml",
-            ),
+            "video": (None, json.dumps(kwargs), "application/json"),
             "file": (thumbnail, thumb_file),
         }
 
         return_data = self.post_request(
-            api_url=f"video/{username}/save/{id}/{get_file_from_path(filename)}",
+            api_url=api_url,
             files=video_data,
             custom_headers={"Content-Disposition": "attachment;filename="},
+        ).json()
+
+        thumb_file.close()
+
+        if "operationCode" not in return_data.json() or return_data.json()["operationCode"] != 1:
+            raise NameError(f"Could not publish video: {return_data.content}")
+
+        return return_data
+
+    def change_video(self, **kwargs):
+        require_keys(kwargs, ["filename", "id"])
+        username = kwargs.get("username") or self.username
+
+        return_data = self.post(
+            api_url=f"video/{username}/change/file/default/{kwargs.get('id')}/{get_file_from_path(kwargs.get('filename'))}"  # noqa: E501
         )
 
-        if "operationCode" not in return_data:
-            raise NameError(f"Could not publish video: {return_data}")
-        elif return_data["operationCode"] == 103:
-            raise ConnectionError(f"Could not publish video, error sending metadata: {return_data}")
-        elif return_data["operationCode"] != 1:
-            raise NameError(f"Could not publish video: {return_data}")
+        if return_data.json()["operationCode"] != 0:
+            raise ConnectionError(f"Could not update video file: {return_data.content}")
 
         return return_data
 
-    def change_video(self, filename: str, id: str, username=None):
-        if not username:
-            username = self.username
+    def change_data(self, **kwargs):
+        require_keys(kwargs, ["id", "title", "keywords"])
+        username = kwargs.get("username") or self.username
+        changeAssociation = kwargs.get("changeAssociation") or "false"
 
-        return_data = self.post(api_url=f"video/{username}/change/file/default/{id}/{get_file_from_path(filename)}")
+        api_url = f"video/{username}/update/{kwargs.pop('id')}?changeAssociation={changeAssociation}"
 
-        if return_data["operationCode"] != 0:
-            raise ConnectionError(f"Could not update video file: {return_data}")
+        video_data = {"video": (None, json.dumps(kwargs), "application/json")}
 
-        return return_data
+        return self.post_request(api_url=api_url, files=video_data)
 
-    def delete(self, id: str, username: str = None, oauth: bool = False):
-        if not username:
-            username = self.username
+    def delete(self, **kwargs):
+        require_keys(kwargs, ["id"])
+        username = kwargs.get("username") or self.username
 
-        del_resp = requests.delete(f"{self.url}video/{username}/delete/{id}", headers=self.get_header(oauth))
+        return requests.delete(f"{self.url}video/{username}/delete/{kwargs.get('id')}", headers=self.get_header())
 
-        if self.json:
-            return del_resp.json()
-        else:
-            return del_resp
+    def get_user_videos(self, **kwargs):
+        return self.get_request(api_url=f"video/{kwargs.get('username') or self.username}/list")
 
-    def get_user_videos(self, username: str = None):
-        return self.get_request(api_url=f"video/{username}/list")
-
-    def get_video(self, id: str):
-        return self.get_request(api_url=f"video/origin/versions/{id}")
+    def get_video(self, **kwargs):
+        require_keys(kwargs, ["id"])
+        return self.get_request(api_url=f"video/origin/versions/{kwargs.get('id')}")

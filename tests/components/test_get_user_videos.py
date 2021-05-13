@@ -13,7 +13,7 @@ def suite():
 
 class GetUserVideosTestCase(unittest.TestCase):
     def setUp(self):
-        self.client = RNP(client_id="ID", client_key="KEY", json=False)
+        self.client = RNP(client_id="ID", client_key="KEY")
 
     @responses.activate
     def test_can_get_user_videos(self):
