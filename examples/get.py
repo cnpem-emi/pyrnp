@@ -6,4 +6,4 @@ client = RNP(
     username="fulano.detal@org.br",
 )
 
-client.get_video("video_unique_id")
+client.get_video(id="video_unique_id")

@@ -6,5 +6,7 @@ client = RNP(
     username="fulano.detal@org.br",
 )
 
-client.upload("video.mp4", "video_unique_id")
-client.publish("video.mp4", "video_unique_id", "title", "test upload", thumbnail="thumb.png")
+client.upload(filename="video.mp4", id="video_unique_id")
+client.publish(
+    filename="video.mp4", id="video_unique_id", title="title", keywords="test upload", thumbnail="thumb.png"
+)

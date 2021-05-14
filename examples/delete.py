@@ -6,4 +6,4 @@ client = RNP(
     username="fulano.detal@org.br",
 )
 
-client.delete("video_unique_id")
+client.delete(id="video_unique_id")

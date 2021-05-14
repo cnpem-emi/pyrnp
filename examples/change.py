@@ -6,5 +6,5 @@ client = RNP(
     username="fulano.detal@org.br",
 )
 
-client.upload("video.mp4", "video_unique_id")
-client.change_video("video.mp4", "video_unique_id")
+client.upload(filename="video.mp4", id="video_unique_id")
+client.change_video(filename="video.mp4", id="video_unique_id")
