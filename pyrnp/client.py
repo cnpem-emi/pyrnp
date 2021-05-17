@@ -56,7 +56,11 @@ class RNP:
                 headers[k] = v
 
         return requests.post(
-            api_url if "apps.kloud.rnp.br/media/" in api_url else f"{self.url}{api_url}", headers=headers, files=files
+            api_url
+            if ("apps.kloud.rnp.br/media/" in api_url or "media-prd.eduplay.rnp.br/media/" in api_url)
+            else f"{self.url}{api_url}",
+            headers=headers,
+            files=files,
         )
 
     def get_header(self):
