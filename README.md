@@ -51,9 +51,7 @@ Depending on your situation, you might not need tokens in order to publish/uploa
 
 ## TODO:
 
-- Add mock request tests
 - Add other API functions
-- Add contributing guide
 
 ## License
 
