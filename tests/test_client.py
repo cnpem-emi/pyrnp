@@ -32,7 +32,7 @@ class RnpClientTestCase(unittest.TestCase):
         self.assertEqual(client.url, "https://hmg.eduplay.rnp.br/services/")
 
     def test_invalid_platform_name(self):
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             NameError, "Invalid platform selected. Available platforms: eduplay, rnp, rnp_test"
         ):
             RNP(client_id="ID", client_key="KEY", platform="INVALID")

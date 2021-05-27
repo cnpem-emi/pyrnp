@@ -21,15 +21,15 @@ class ChangeDataTestCase(unittest.TestCase):
         self.client.change_data(id="1990", title="Video Title", keywords="Keywords")
 
     def test_requires_id(self):
-        with self.assertRaisesRegexp(ValueError, "'id' must be set"):
+        with self.assertRaisesRegex(ValueError, "'id' must be set"):
             self.client.change_data()
 
     def test_requires_title(self):
-        with self.assertRaisesRegexp(ValueError, "'title' must be set"):
+        with self.assertRaisesRegex(ValueError, "'title' must be set"):
             self.client.change_data(id="1991")
 
     def test_requires_keywords(self):
-        with self.assertRaisesRegexp(ValueError, "'keywords' must be set"):
+        with self.assertRaisesRegex(ValueError, "'keywords' must be set"):
             self.client.change_data(id="1992", title="Video Title")
 
 

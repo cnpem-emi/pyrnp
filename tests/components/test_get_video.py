@@ -21,7 +21,7 @@ class GetVideoTestCase(unittest.TestCase):
         self.client.get_video(id="video_id")
 
     def test_requires_id(self):
-        with self.assertRaisesRegexp(ValueError, "'id' must be set"):
+        with self.assertRaisesRegex(ValueError, "'id' must be set"):
             self.client.get_video()
 
 

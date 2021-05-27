@@ -21,7 +21,7 @@ class DeleteTestCase(unittest.TestCase):
         self.client.delete(id="video_id", username="niki")
 
     def test_requires_id(self):
-        with self.assertRaisesRegexp(ValueError, "'id' must be set"):
+        with self.assertRaisesRegex(ValueError, "'id' must be set"):
             self.client.delete()
 
 
