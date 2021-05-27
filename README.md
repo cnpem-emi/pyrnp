@@ -13,7 +13,7 @@ Python wrapper for the Eduplay API (maintained by RNP). Made to be as lightweigh
 ## Installation
 
 ```shell
-git clone https://gitlab.cnpem.br/IoT/PyRNP.git
+git clone https://github.com/ntanck/pyrnp
 cd PyRNP
 pip3 install .
 ```
