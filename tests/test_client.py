@@ -42,6 +42,18 @@ class RnpClientTestCase(unittest.TestCase):
         client.token = "TOKEN"
         self.assertEqual(client.token, "TOKEN")
 
+    def test_get_header_with_token(self):
+        client = RNP(client_id="ID", client_key="KEY", token="TOKEN", oauth=True)
+        self.assertEqual(
+            client.get_header(),
+            {
+                "Accept-Encoding": None,
+                "clientKey": "KEY",
+                "User-Agent": "curl/7.68.0",
+                "Authorization": "Bearer TOKEN",
+            },
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

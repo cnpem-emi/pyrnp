@@ -5,7 +5,6 @@ setup.py
 pyrnp/__init__.py
 pyrnp/client.py
 pyrnp/exception.py
-pyrnp/extra.py
 pyrnp/util.py
 pyrnp.egg-info/PKG-INFO
 pyrnp.egg-info/SOURCES.txt

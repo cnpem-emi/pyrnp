@@ -117,9 +117,6 @@ class RNP:
 
         thumb_file.close()
 
-        if "operationCode" not in return_data.json() or return_data.json()["operationCode"] != 1:
-            raise NameError(f"Could not publish video: {return_data.content}")
-
         return return_data
 
     def change_video(self, **kwargs):
@@ -129,9 +126,6 @@ class RNP:
         return_data = self.post_request(
             api_url=f"video/{username}/change/file/default/{kwargs.get('id')}/{get_file_from_path(kwargs.get('filename'))}"  # noqa: E501
         )
-
-        if return_data.json()["operationCode"] != 0:
-            raise ConnectionError(f"Could not update video file: {return_data.content}")
 
         return return_data
 
@@ -147,7 +141,7 @@ class RNP:
         return self.post_request(api_url=api_url, files=video_data)
 
     def delete(self, **kwargs):
-        require_keys(kwargs, ["id"])
+        require_keys(kwargs, "id")
         username = kwargs.get("username") or self.username
 
         return requests.delete(f"{self.url}video/{username}/delete/{kwargs.get('id')}", headers=self.get_header())
