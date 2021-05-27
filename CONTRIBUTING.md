@@ -1,5 +1,7 @@
 # Contributing
 
+Based on [Zoomus'](https://github.com/prschmid/zoomus) contributing code.
+
 ## Dev Environment
 
 In order to avoid interference with global packages and present an environment 
@@ -33,8 +35,6 @@ tox
 Assuming all goes well, you should see a result akin to
 
 ```sh
-  py36: commands succeeded
-  py37: commands succeeded
   py38: commands succeeded
   py39: commands succeeded
   congratulations :)
@@ -49,8 +49,6 @@ being merged.
 
 These versions are currently:
 
-* 3.6
-* 3.7
 * 3.8
 * 3.9
 
