@@ -1,5 +1,8 @@
 # PyRNP
 
+[![PyRNP](https://github.com/ntanck/pyrnp/actions/workflows/python-app.yml/badge.svg)](https://github.com/ntanck/pyrnp/actions/workflows/python-app.yml)
+[![codecov](https://codecov.io/gh/ntanck/pyrnp/branch/master/graph/badge.svg?token=VnxuTqUaHs)](https://codecov.io/gh/ntanck/pyrnp)
+
 Python wrapper for the Eduplay API (maintained by RNP). Made to be as lightweight as possible, only requires Requests!
 
 ## Contributors
@@ -44,7 +47,7 @@ In order to obtain your client key and ID, you must contact [RNP](https://www.rn
 
 ## Token quirks
 
-Depending on your situation, you might not need tokens in order to publish/upload/change/delete videos. This is why I've made OAuth2 disabled by default. In order to get a token, you can follow the RNP documentation [here](https://eduplay.rnp.br/portal/integration#authentication) or use the `get_token` function in `extra.py` to display a Webdriver and get the token.
+Depending on your situation, you might not need tokens in order to publish/upload/change/delete videos. This is why I've made OAuth2 disabled by default. In order to get a token, you can follow the RNP documentation [here](https://eduplay.rnp.br/portal/integration#authentication) or use the `get_token` function in `pyrnp.extra` to display a Webdriver and get the token.
 
 ## TODO:
 
