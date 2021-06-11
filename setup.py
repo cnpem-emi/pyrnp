@@ -9,10 +9,12 @@ import re
 here = os.path.abspath(os.path.dirname(__file__))
 
 
-def read(file_path):
-    with open(file_path, 'r') as file:
-        data = file.read()
-        return data
+def read(file_paths, default=""):
+    try:
+        with codecs.open(os.path.join(here, *file_paths), "r") as fh:
+            return fh.read()
+    except Exception:
+        return default
 
 def find_version(file_paths):
     version_file = read(file_paths)
@@ -31,7 +33,7 @@ setup(
     install_requires=["requests"],
     author_email="g.fr@tuta.io",
     description="Python client library for Eduplay (video platform from RNP)",
-    long_description=read("README.md"),
+    long_description=read(["README.md"]),
     long_description_content_type='text/markdown',
     packages=["pyrnp"],
     include_package_data=True,
