@@ -2,6 +2,7 @@
 
 [![PyRNP](https://github.com/ntanck/pyrnp/actions/workflows/python-app.yml/badge.svg)](https://github.com/ntanck/pyrnp/actions/workflows/python-app.yml)
 [![codecov](https://codecov.io/gh/ntanck/pyrnp/branch/master/graph/badge.svg?token=VnxuTqUaHs)](https://codecov.io/gh/ntanck/pyrnp)
+[![PyPi](https://img.shields.io/pypi/v/pyrnp.svg)](https://pypi.org/project/pyrnp/)
 
 Python wrapper for the Eduplay API (maintained by RNP). Made to be as lightweight as possible, only requires Requests!
 
