@@ -14,7 +14,7 @@ Python wrapper for the Eduplay API (maintained by RNP). Made to be as lightweigh
 ## Installation
 
 ```shell
-git clone https://github.com/ntanck/pyrnp
+git clone https://github.com/cnpem-sei/pyrnp
 cd PyRNP
 pip3 install .
 ```
