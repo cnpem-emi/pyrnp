@@ -16,6 +16,7 @@ def read(file_paths, default=""):
     except Exception:
         return default
 
+
 def find_version(file_paths):
     version_file = read(file_paths)
     version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", version_file, re.M)
@@ -34,7 +35,7 @@ setup(
     author_email="g.fr@tuta.io",
     description="Python client library for Eduplay (video platform from RNP)",
     long_description=read(["README.md"]),
-    long_description_content_type='text/markdown',
+    long_description_content_type="text/markdown",
     packages=["pyrnp"],
     include_package_data=True,
     platforms="any",

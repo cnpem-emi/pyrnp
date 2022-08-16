@@ -10,3 +10,18 @@ def require_keys(d, keys):
             raise ValueError("'{}' must be set".format(k))
 
     return True
+
+
+def validate(func):
+    def wrapper(*args, **kwargs):
+        reply = func(*args, **kwargs)
+
+        try:
+            if reply.status_code not in [200, 201]:
+                raise ConnectionError("Action failed: ", reply.content)
+        except (KeyError, AttributeError):
+            raise ConnectionError("Action failed: ", reply.content)
+
+        return reply
+
+    return wrapper

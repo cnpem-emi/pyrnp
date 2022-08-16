@@ -1,5 +1,5 @@
 import os
-from pyrnp.util import get_file_from_path, require_keys
+from pyrnp.util import get_file_from_path, require_keys, validate
 from pyrnp.exception import InvalidFileError
 import requests
 import json
@@ -76,6 +76,7 @@ class RNP:
 
         return headers
 
+    @validate
     def upload(self, **kwargs):
         require_keys(kwargs, ["filename", "id"])
 
@@ -96,6 +97,7 @@ class RNP:
         else:
             raise ConnectionError("Upload failed: ", req.content)
 
+    @validate
     def publish(self, **kwargs):
         require_keys(kwargs, ["title", "keywords", "filename", "id"])
 
@@ -120,6 +122,7 @@ class RNP:
 
         return return_data
 
+    @validate
     def change_video(self, **kwargs):
         require_keys(kwargs, ["filename", "id"])
         username = kwargs.get("username") or self.username
@@ -130,6 +133,7 @@ class RNP:
 
         return return_data
 
+    @validate
     def change_data(self, **kwargs):
         require_keys(kwargs, ["id", "title", "keywords"])
         username = kwargs.get("username") or self.username
@@ -141,15 +145,18 @@ class RNP:
 
         return self.post_request(api_url=api_url, files=video_data)
 
+    @validate
     def delete(self, **kwargs):
         require_keys(kwargs, "id")
         username = kwargs.get("username") or self.username
 
         return requests.delete(f"{self.url}video/{username}/delete/{kwargs.get('id')}", headers=self.get_header())
 
+    @validate
     def get_user_videos(self, **kwargs):
         return self.get_request(api_url=f"video/{kwargs.get('username') or self.username}/list")
 
+    @validate
     def get_video(self, **kwargs):
         require_keys(kwargs, ["id"])
         return self.get_request(api_url=f"video/origin/versions/{kwargs.get('id')}")
