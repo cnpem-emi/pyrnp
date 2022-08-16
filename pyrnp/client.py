@@ -1,3 +1,4 @@
+import os
 from pyrnp.util import get_file_from_path, require_keys
 from pyrnp.exception import InvalidFileError
 import requests
@@ -6,16 +7,16 @@ import json
 PLATFORMS = {"eduplay_test": "https://hmg.eduplay.rnp.br/services/", "eduplay": "https://eduplay.rnp.br/services/"}
 
 SUPPORTED_FILETYPES = [
-    "mp4",
-    "flv",
-    "ogv",
-    "wmv",
-    "avi",
-    "webm",
-    "3gp",
-    "mov",
-    "ogg",
-    "mkv",
+    ".mp4",
+    ".flv",
+    ".ogv",
+    ".wmv",
+    ".avi",
+    ".webm",
+    ".3gp",
+    ".mov",
+    ".ogg",
+    ".mkv",
 ]
 
 
@@ -57,7 +58,7 @@ class RNP:
 
         return requests.post(
             api_url
-            if ("apps.kloud.rnp.br/media/" in api_url or "media-prd.eduplay.rnp.br/media/" in api_url)
+            if ("apps.kloud.rnp.br/media/" in api_url or "media-prd-nh.eduplay.rnp.br/media/" in api_url)
             else f"{self.url}{api_url}",
             headers=headers,
             files=files,
@@ -78,7 +79,7 @@ class RNP:
     def upload(self, **kwargs):
         require_keys(kwargs, ["filename", "id"])
 
-        if kwargs.get("filename").split(".")[1] not in SUPPORTED_FILETYPES:
+        if os.path.splitext(kwargs.get("filename"))[1] not in SUPPORTED_FILETYPES:
             raise InvalidFileError("This filetype is not supported")
 
         parsed_filename = get_file_from_path(kwargs.get("filename"))
@@ -93,7 +94,7 @@ class RNP:
         if "files" in req.json():
             return req
         else:
-            raise ConnectionError("Upload failed: " + req.content)
+            raise ConnectionError("Upload failed: ", req.content)
 
     def publish(self, **kwargs):
         require_keys(kwargs, ["title", "keywords", "filename", "id"])
