@@ -67,7 +67,7 @@ class RNP:
     def get_header(self):
         headers = {
             "Accept-Encoding": None,
-            "clientKey": self.client_key,
+            "clientkey": self.client_key,
             "User-Agent": "curl/7.68.0",  # Keep this
         }
 
@@ -107,13 +107,13 @@ class RNP:
 
         video_data = {
             "video": (None, json.dumps(kwargs), "application/json"),
-            "file": (thumbnail, thumb_file),
+            "file": (thumbnail, thumb_file, "image/png"),
         }
 
         return_data = self.post_request(
             api_url=api_url,
             files=video_data,
-            custom_headers={"Content-Disposition": "attachment;filename="},
+            custom_headers={"Content-Disposition": get_file_from_path(thumbnail)},
         )
 
         thumb_file.close()
