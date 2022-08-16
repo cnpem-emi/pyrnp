@@ -48,7 +48,7 @@ class RnpClientTestCase(unittest.TestCase):
             client.get_header(),
             {
                 "Accept-Encoding": None,
-                "clientKey": "KEY",
+                "clientkey": "KEY",
                 "User-Agent": "curl/7.68.0",
                 "Authorization": "Bearer TOKEN",
             },
